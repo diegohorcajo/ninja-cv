@@ -19,12 +19,22 @@ gemini = GeminiAPI(api_key=apikey)
 
 class CVMatcher:
     def __init__(self, model_name="all-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(model_name)
+        self.model   = None
+        self.model_name = model_name
         self.cv_data = None
         self.offer_data = None
 
+
+    def _load_model(self):
+        # Esta función carga el modelo solo si no ha sido cargado antes
+        if self.model is None:
+            print("Loading SentenceTransformer model for the first time...")
+            self.model = SentenceTransformer(self.model_name)
+            print("Model loaded successfully.")
+
     # ----------- 1. Sector -----------
     def preprocess_sector(self, sector):
+        self._load_model()
         if isinstance(sector, str):
             output = sector.lower().strip().replace(",", " and")
         elif isinstance(sector, list):
@@ -64,10 +74,12 @@ class CVMatcher:
 
     # ----------- 2. Educación -----------
     def preprocess_field(self, field):
+        self._load_model()
         return f"field of study: {field.lower().strip().replace(',', ' and')}"
 
 
     def education_similarity(self, offer_dict, cv_education):
+        self._load_model()
         offer_field = self.preprocess_field(offer_dict['education']['field'])
         cv_field    = self.preprocess_field(cv_education['field'])
         offer_emb, cv_emb = self.model.encode([offer_field, cv_field])
@@ -77,6 +89,7 @@ class CVMatcher:
 
 
     def education_final_score(self, offer_dict, cv_dict):
+        self._load_model()
         # Get minimum education level from offer and ensure it's a float
         min_education = float(offer_dict.get('education', {}).get('number', 0))
         
@@ -122,6 +135,7 @@ class CVMatcher:
 
     # ----------- 3. Skills -----------
     def skills_similarity(self, offer_dict, cv_dict, type="technical"):
+        self._load_model()
         if type == "technical":
             cv_skills = [s.lower() for s in cv_dict.get("technical_abilities", [])]
             offer_skills = [s.lower() for s in offer_dict.get("technical_abilities", [])]
@@ -155,11 +169,13 @@ class CVMatcher:
 
     # ----------- 4. Experiencia en el rol -----------
     def role_similarity(self, offer_role, cv_roles):
+        self._load_model()
         cv_embeddings    = self.model.encode(cv_roles)
         offer_embedding  = self.model.encode(offer_role)
         return cosine_similarity([offer_embedding], cv_embeddings)[0]
 
     def role_experience_similarity(self, offer_dict, cv_dict):
+        self._load_model()
         total_experience = 0
         role_similarities = []
         
@@ -211,6 +227,7 @@ class CVMatcher:
     # ----------- 5. Creación del diccionario -----------
 
     def final_score(self, offer_path, cv_path):
+        self._load_model()
         """
         Calculate final matching scores between an offer and a CV.
         
@@ -232,6 +249,7 @@ class CVMatcher:
 
 
     def create_dict(self, offer_dict, cv_dict):
+        self._load_model()
         # Get technical skills with similarity scores
         tech_skills_dict, tech_score = self.skills_similarity(offer_dict, cv_dict, "technical")
         soft_skills_dict, soft_score = self.skills_similarity(offer_dict, cv_dict, "soft")
