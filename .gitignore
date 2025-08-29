@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+project/__pycache__
+*.pyc
+.env
+project/ninja_cv.ipynb
+project/tmp

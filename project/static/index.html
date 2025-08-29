@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de CV</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #f8f9fa;
+            --background-color: #f5f7ff;
+            --surface-color: #ffffff;
+            --text-color: #2b2d42;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --success-color: #4bb543;
+            --error-color: #dc3545;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            transition: var(--transition);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .full-width {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .app-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 2rem 0;
+            width: 100%;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            max-width: 100vw;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Info Section */
+        .info-section {
+            margin-bottom: 4rem;
+        }
+
+        .info-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .info-card h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            background: rgba(67, 97, 238, 0.05);
+            border: 1px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .info-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .info-item h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .info-item p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 3rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+            border: none;
+            margin: 0;
+            opacity: 0.5;
+        }
+
+        .divider span {
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+            color: #6c757d;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin: 0 auto 3rem;
+            border: 1px solid var(--border-color);
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn .btn-loader {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        .btn.loading .btn-loader {
+            display: flex;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--surface-color);
+            padding: 3rem 1rem;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-color);
+            max-width: 100vw;
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-copyright {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            background: #fff;
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: var(--surface-color);
+            resize: vertical;
+            transition: var(--transition);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
+            background-color: #fff;
+        }
+
+        textarea::placeholder {
+            color: var(--text-light);
+            opacity: 0.8;
+        }
+
+        /* Character counter styles */
+        .character-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .character-counter.warning {
+            color: #e67e22;
+        }
+
+        .character-counter.error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .file-input-container {
+            position: relative;
+            margin-top: 0.5rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem 1rem;
+            text-align: center;
+            transition: var(--transition);
+            background-color: var(--surface-color);
+        }
+
+        .file-input-container.drag-over {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .file-input-container .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 1rem;
+        }
+
+        .file-input-container i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .file-input-container .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-input {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            background-color: rgba(67, 97, 238, 0.05);
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .file-label:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-color: var(--primary-hover);
+        }
+
+        .file-label i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-style: italic;
+            padding: 0.25rem 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+        /* Resultados */
+        #result {
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-container {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(67, 97, 238, 0.15);
+            position: relative;
+        }
+        
+        .results-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .results-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 2rem 0;
+        }
+
+        #radarChart {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .scores-container {
+            margin-top: 2rem;
+            width: 100%;
+        }
+        
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .scores-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scores-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .scores-list li {
+            background: var(--secondary-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .score-value {
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(67, 97, 238, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            display: none;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: var(--border-radius);
+            border: 1px dashed rgba(67, 97, 238, 0.3);
+        }
+
+        .spinner {
+            border: 4px solid rgba(67, 97, 238, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+            box-shadow: 0 0 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .loading-text {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Animaciones */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 90%;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--error-color);
+        }
+        
+        .notification.info {
+            background-color: var(--primary-color);
+        }
+        
+        /* Barras de progreso */
+        .progress-bar {
+            position: relative;
+            background: #f0f2f5;
+            border-radius: 8px;
+            height: 50px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border: 1px solid #e1e4e8;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .progress-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(67, 97, 238, 0.15), 
+                rgba(67, 97, 238, 0.3));
+            border-radius: 8px 0 0 8px;
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0;
+            box-shadow: 2px 0 10px rgba(67, 97, 238, 0.1);
+        }
+        
+        .score-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .score-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .score-card-header:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .score-card-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .score-value {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0 1rem;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            color: var(--text-light);
+        }
+
+        .score-card.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .score-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+        }
+
+        .score-card.active .score-card-content {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .score-details {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            flex: 1;
+            text-transform: capitalize;
+            letter-spacing: 0.3px;
+        }
+        
+        .progress-value {
+            position: relative;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(45deg, var(--primary-color), #5a7aff);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            z-index: 1;
+            margin-left: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            min-width: 70px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.2);
+        }
+        
+        /* Responsive */
+        /* Responsive */
+        @media (max-width: 992px) {
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .scores-list ul {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="full-width">
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Ninja CV</h1>
+                    <p class="hero-subtitle">Leverage your job search</p>
+                    <div class="hero-cta">
+                        <span>Smart • Fast • Precise</span>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="info-section">
+                <div class="info-card">
+                    <h2>How does it work?</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-icon">1</div>
+                            <h3>Paste the offer</h3>
+                            <p>Insert the full text of the job offer you are interested in</p>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">2</div>
+                            <h3>Upload your CV</h3>
+                            <p>Upload your CV in PDF format to analyze it</p>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">3</div>
+                            <h3>Get results</h3>
+                            <p>Receive a detailed analysis of your compatibility with the offer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider">
+                    <span>Start analysis</span>
+                </div>
+
+                <div class="form-container">
+                    <form id="cvForm" onsubmit="evaluateCV(); return false;">
+                        <div class="form-group">
+                            <label for="offerText">📋 Offer text</label>
+                            <textarea 
+                                class="form-control" 
+                                id="offerText" 
+                                name="offer_text" 
+                                rows="15" 
+                                maxlength="10000" 
+                                placeholder="Pega aquí el texto de la oferta de empleo..." 
+                                required
+                                oninput="updateCharCount(this)"
+                            ></textarea>
+                            <div class="character-counter" id="charCounter">0/10000 characters</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cvFile">📄 Upload your CV (PDF)</label>
+                            <div class="file-input-container" id="dropZone">
+                                <label for="cvFile" class="file-label">
+                                    <i>📤</i>
+                                    <span id="fileName">Click to select or drag & drop your CV here</span>
+                                </label>
+                                <input 
+                                    type="file" 
+                                    id="cvFile" 
+                                    class="file-input" 
+                                    accept=".pdf" 
+                                    onchange="updateFileName()"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                                <span class="btn-text">Analyze</span>
+                                <span class="btn-loader" style="display: none;">
+                                    <span class="spinner"></span>
+                                    Analyzing...
+                                </span>
+                    </div>
+                    
+                    <section id="result" class="section" style="display: none;">
+                        <div class="container">
+                            <h2 class="section-title">Results</h2>
+                            <div class="results-container">
+                                <div class="chart-container">
+                                    <canvas id="radarChart"></canvas>
+                                </div>
+                                <div class="scores-container">
+                                    <h3>Score details</h3>
+                                    <div id="scoresList" class="scores-grid">
+                                        <!-- Las tarjetas de puntuación se insertarán aquí dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </main>
+
+        <div class="full-width">
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-logo">Ninja CV</div>
+                    <div class="footer-copyright">
+                        &copy; 2025 Ninja CV. All rights reserved.
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Función para actualizar el nombre del archivo seleccionado
+        function updateFileName() {
+            const fileInput = document.getElementById('cvFile');
+            const fileNameDisplay = document.getElementById('fileName');
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file ? file.name : 'Click to select or drag & drop your CV here';
+        }
+
+        // Drag and Drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('cvFile');
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+            
+            // File input change handler
+            fileInput.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (file) {
+                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (file.size > maxSize) {
+                        showNotification('File size must be less than 5MB', 'error');
+                        this.value = ''; // Clear the input
+                        updateFileName();
+                    } else {
+                        updateFileName();
+                    }
+                }
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight() {
+                dropZone.classList.add('drag-over');
+            }
+
+            function unhighlight() {
+                dropZone.classList.remove('drag-over');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    const file = files[0];
+                    // Check file type
+                    if (file.type !== 'application/pdf') {
+                        showNotification('Please upload a valid PDF file', 'error');
+                        return;
+                    }
+                    
+                    // Check file size (5MB max)
+                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (file.size > maxSize) {
+                        showNotification('File size must be less than 5MB', 'error');
+                        return;
+                    }
+                    
+                    fileInput.files = files;
+                    updateFileName();
+                }
+            }
+            
+        });
+
+        // Función para actualizar el contador de caracteres
+        function updateCharCount(textarea) {
+            const charCount = textarea.value.length;
+            const maxLength = textarea.maxLength;
+            const minLength = 100; // Mínimo de caracteres
+            const counter = document.getElementById('charCounter');
+            
+            counter.textContent = `${charCount}/${maxLength} characters`;
+            
+            // Cambiar estilos según el número de caracteres
+            counter.className = 'character-counter';
+            
+            if (charCount === 0) {
+                counter.textContent = `At least ${minLength} characters`;
+                counter.classList.add('error');
+            } else if (charCount < minLength) {
+                counter.textContent = `${charCount}/${minLength} characters`;
+                counter.classList.add('error');
+            } else {
+                const percentage = (charCount / maxLength) * 100;
+                if (percentage > 90) {
+                    counter.classList.add('error');
+                } else if (percentage > 75) {
+                    counter.classList.add('warning');
+                }
+            }
+        }
+        
+        // Inicializar contador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('offerText');
+            if (textarea) {
+                updateCharCount(textarea);
+            }
+        });
+
+        // Función para mostrar notificación
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Mostrar notificación
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        // Function to validate the form
+        function validateForm() {
+            // Validate offer text
+            const offerText = document.getElementById('offerText').value.trim();
+            const MIN_OFFER_LENGTH = 100;
+            const MAX_OFFER_LENGTH = 10000;
+            
+            if (!offerText) {
+                showNotification('Please enter the offer text', 'error');
+                return false;
+            }
+            
+            if (offerText.length < MIN_OFFER_LENGTH) {
+                showNotification(`The offer text is too short. Minimum required: ${MIN_OFFER_LENGTH} characters`, 'error');
+                return false;
+            }
+            
+            if (offerText.length > MAX_OFFER_LENGTH) {
+                showNotification(`The offer text is too long. Maximum allowed: ${MAX_OFFER_LENGTH} characters`, 'error');
+                return false;
+            }
+            
+            // Validate CV file
+            const cvFile = document.getElementById('cvFile').files[0];
+            const MIN_CV_SIZE = 10; // characters
+            const MAX_CV_SIZE = 5 * 1024 * 1024; // 5MB
+            
+            if (!cvFile) {
+                showNotification('Please select a PDF file', 'error');
+                return false;
+            }
+            
+            // Check file type
+            if (cvFile.type !== 'application/pdf') {
+                showNotification('Only PDF files are allowed', 'error');
+                return false;
+            }
+            
+            // Check file size
+            if (cvFile.size < MIN_CV_SIZE) {
+                showNotification(`The CV file is too small. Minimum required: ${MIN_CV_SIZE} characters`, 'error');
+                return false;
+            }
+            
+            if (cvFile.size > MAX_CV_SIZE) {
+                showNotification('The file is too large. Maximum allowed: 5MB', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        async function evaluateCV() {
+            // Validate form before submitting
+            if (!validateForm()) {
+                return;
+            }
+            
+            const form = document.getElementById('cvForm');
+            const formData = new FormData(form);
+            const offerText = document.getElementById('offerText').value;
+            const cvFile = document.getElementById('cvFile').files[0];
+
+            // Get DOM elements
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const btnText = analyzeBtn?.querySelector('.btn-text');
+            const btnLoader = analyzeBtn?.querySelector('.btn-loader');
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            // Show loading elements
+            if (loadingSpinner) loadingSpinner.style.display = 'block';
+            if (analyzeBtn) analyzeBtn.disabled = true;
+            if (btnText) btnText.style.display = 'none';
+            if (btnLoader) btnLoader.style.display = 'flex';
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            if (resultDiv) resultDiv.style.display = 'none';
+    
+
+            try {
+                // Deshabilitar botón y mostrar carga
+                analyzeBtn.disabled = true;
+                if (btnText) btnText.style.display = 'none';
+                if (btnLoader) btnLoader.style.display = 'flex';
+                
+                // Mostrar indicador de carga y ocultar resultados anteriores
+                if (loadingDiv) loadingDiv.style.display = 'block';
+                if (resultDiv) resultDiv.style.display = 'none';
+                
+                // Mostrar notificación de inicio
+                showNotification('Analyzing your CV, please wait...', 'info');
+                
+                const formData = new FormData();
+                formData.append('offer_text', offerText);
+                formData.append('cv_file', cvFile);
+                
+                console.log('Sending request to server...');
+                const response = await fetch('http://localhost:8000/match_cv/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response received:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error in response:', errorText);
+                    throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received data:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Mostrar resultados con animación
+                setTimeout(() => {
+                    displayResults(data);
+                    showNotification('Analysis completed successfully!', 'success');
+                }, 300);
+                
+            } catch (error) {
+                console.error('Error en evaluateCV:', error);
+                
+                // Mostrar notificación de error
+                const errorMessage = error.message || 'An error occurred while processing the request';
+                showNotification(`Error: ${errorMessage}`, 'error');
+                
+            } finally {
+                // Asegurarse de que el botón se restablezca incluso si hay un error
+                if (analyzeBtn) analyzeBtn.disabled = false;
+                if (btnText) btnText.style.display = 'inline';
+                if (btnLoader) btnLoader.style.display = 'none';
+                if (loadingDiv) loadingDiv.style.display = 'none';
+            }
+        }
+        
+        function formatCategoryName(category) {
+            let formatted = category.replace(/score$/i, '');
+            formatted = formatted.replace(/_/g, ' ');
+            return formatted.toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+                .trim();
+        }
+
+        function displayResults(scores) {
+            const resultDiv = document.getElementById('result');
+            const scoresList = document.getElementById('scoresList');
+            
+            // Limpiar resultados anteriores
+            scoresList.innerHTML = '';
+            
+            try {
+                // Crear el gráfico de radar
+                createRadarChart(scores);
+                
+                // Definir las categorías que queremos mostrar (mismas que en el radar)
+                const categoriesToShow = [
+                    'technical_skills_score',
+                    'soft_skills_score',
+                    'role_experience_score',
+                    'education_score',
+                    'sector_score'
+                ];
+                
+                // Filtrar y mostrar solo las categorías que nos interesan
+                categoriesToShow.forEach((category, index) => {
+                    if (scores[category] !== undefined) {
+                        const score = scores[category];
+                        const formattedScore = parseFloat(score).toFixed(2);
+                        const percentage = Math.max(5, Math.round(score));
+                        
+                        // Crear tarjeta
+                        const card = document.createElement('div');
+                        card.className = 'score-card';
+                        card.style.animationDelay = `${index * 0.1}s`;
+                        
+                        // Crear encabezado de la tarjeta
+                        const cardHeader = document.createElement('div');
+                        cardHeader.className = 'score-card-header';
+                        
+                        // Título de la categoría
+                        const title = document.createElement('h3');
+                        title.textContent = formatCategoryName(category);
+                        
+                        // Valor del score
+                        const scoreValue = document.createElement('div');
+                        scoreValue.className = 'score-value';
+                        scoreValue.textContent = `${formattedScore}%`;
+                        
+                        // Ícono de toggle
+                        const toggleIcon = document.createElement('span');
+                        toggleIcon.className = 'toggle-icon';
+                        toggleIcon.innerHTML = '▼';
+                        
+                        // Barra de progreso
+                        const progressBar = document.createElement('div');
+                        progressBar.className = 'progress-bar';
+                        
+                        const progressFill = document.createElement('div');
+                        progressFill.className = 'progress-bar-fill';
+                        progressBar.appendChild(progressFill);
+                        
+                        // Contenido expandible
+                        const cardContent = document.createElement('div');
+                        cardContent.className = 'score-card-content';
+                        
+                        // Detalles específicos de cada categoría
+                        const details = document.createElement('div');
+                        details.className = 'score-details';
+                        
+                        // Mostrar habilidades técnicas (top 3 y bottom 3)
+                        if (category === 'technical_skills_score' && scores.technical_skills) {
+                            const skillsContainer = document.createElement('div');
+                            
+                            // Mostrar top 3 habilidades
+                            if (scores.technical_skills.top_matches && scores.technical_skills.top_matches.length > 0) {
+                                const topTitle = document.createElement('h4');
+                                topTitle.textContent = 'Top 3 skills (high similarity):';
+                                topTitle.style.margin = '0.5rem 0';
+                                skillsContainer.appendChild(topTitle);
+                                
+                                const topList = document.createElement('ul');
+                                topList.style.listStyle = 'none';
+                                topList.style.padding = '0';
+                                topList.style.margin = '0.5rem 0 1rem 0';
+                                
+                                scores.technical_skills.top_matches.forEach(skill => {
+                                    if (skill) {
+                                        const li = document.createElement('li');
+                                        li.style.padding = '0.5rem 0';
+                                        li.style.borderBottom = '1px solid var(--border-color)';
+                                        li.textContent = skill;
+                                        topList.appendChild(li);
+                                    }
+                                });
+                                skillsContainer.appendChild(topList);
+                            }
+                            
+                            // Mostrar bottom 3 habilidades si existen
+                            if (scores.technical_skills.bottom_matches && scores.technical_skills.bottom_matches.length > 0) {
+                                const bottomTitle = document.createElement('h4');
+                                bottomTitle.textContent = 'Bottom 3 skills (low similarity):';
+                                bottomTitle.style.margin = '1rem 0 0.5rem 0';
+                                skillsContainer.appendChild(bottomTitle);
+                                
+                                const bottomList = document.createElement('ul');
+                                bottomList.style.listStyle = 'none';
+                                bottomList.style.padding = '0';
+                                bottomList.style.margin = '0.5rem 0';
+                                
+                                scores.technical_skills.bottom_matches.forEach(skill => {
+                                    if (skill) {
+                                        const li = document.createElement('li');
+                                        li.style.padding = '0.5rem 0';
+                                        li.style.borderBottom = '1px solid var(--border-color)';
+                                        li.textContent = skill;
+                                        bottomList.appendChild(li);
+                                    }
+                                });
+                                skillsContainer.appendChild(bottomList);
+                            }
+                            
+                            details.appendChild(skillsContainer);
+                        }
+                        
+                        // Mostrar detalles de educación
+                        if (category === 'education_score' && scores.education) {
+                            const eduDetails = document.createElement('div');
+                            eduDetails.style.marginTop = '1rem';
+                            
+                            // Explicación principal
+                            //if (scores.education.explanation) {
+                            //    const explanation = document.createElement('p');
+                            //    explanation.textContent = scores.education.explanation;
+                            //    explanation.style.margin = '0.5rem 0';
+                            //    eduDetails.appendChild(explanation);
+                            //}
+                            
+                            // Detalles adicionales
+                            if (scores.education.details) {
+                                const detailList = document.createElement('ul');
+                                detailList.style.listStyle = 'none';
+                                detailList.style.padding = '0';
+                                detailList.style.margin = '0.5rem 0';
+                                
+                                const minReqItem = document.createElement('li');
+                                minReqItem.style.padding = '0.5rem 0';
+                                minReqItem.style.borderBottom = '1px solid var(--border-color)';
+                                minReqItem.innerHTML = `<strong>Required education level:</strong> ${scores.education.details.minimum_required_level || 'Not specified'}`;
+                                
+                                const minFieldItem = document.createElement('li');
+                                minFieldItem.style.padding = '0.5rem 0';
+                                minFieldItem.style.borderBottom = '1px solid var(--border-color)';
+                                minFieldItem.innerHTML = `<strong>Required field of study:</strong> ${scores.education.details.minimum_required_field || 'Not specified'}`;
+                                
+                                const candidateLevelItem = document.createElement('li');
+                                candidateLevelItem.style.padding = '0.5rem 0';
+                                candidateLevelItem.style.borderBottom = '1px solid var(--border-color)';
+                                candidateLevelItem.innerHTML = `<strong>Candidate education level:</strong> ${scores.education.details.equivalent_level_cv || 'Not specified'}`;
+                                
+                                const candidateFieldItem = document.createElement('li');
+                                candidateFieldItem.style.padding = '0.5rem 0';
+                                candidateFieldItem.style.borderBottom = '1px solid var(--border-color)';
+                                candidateFieldItem.innerHTML = `<strong>Candidate field of study:</strong> ${scores.education.details.equivalent_field_cv || 'Not specified'}`;
+                                
+                                const higherItem = document.createElement('li');
+                                higherItem.style.padding = '0.5rem 0';
+                                higherItem.style.borderBottom = '1px solid var(--border-color)';
+                                higherItem.innerHTML = `<strong>Higher education:</strong> ${scores.education.details.higher_education_degrees && scores.education.details.higher_education_degrees.length > 0 ? scores.education.details.higher_education_degrees.join(', ') : 'None'}`;
+                                
+                                detailList.appendChild(minReqItem);
+                                detailList.appendChild(minFieldItem);
+                                detailList.appendChild(candidateLevelItem);
+                                detailList.appendChild(candidateFieldItem);
+                                detailList.appendChild(higherItem);
+                                
+                                eduDetails.appendChild(detailList);
+                            }
+                            
+                            details.appendChild(eduDetails);
+                        }
+
+                        
+                        // Mostrar soft skills (formato top/bottom o lista ordenada)
+                        if (category === 'soft_skills_score' && scores.soft_skills) {
+                            const skillsContainer = document.createElement('div');
+                            
+                            if (scores.soft_skills.top_matches) {
+                                // Formato con top y bottom matches
+                                if (scores.soft_skills.top_matches && scores.soft_skills.top_matches.length > 0) {
+                                    const topTitle = document.createElement('h4');
+                                    topTitle.textContent = 'Top 3 skills (high similarity):';
+                                    topTitle.style.margin = '0.5rem 0';
+                                    skillsContainer.appendChild(topTitle);
+                                    
+                                    const topList = document.createElement('ul');
+                                    topList.style.listStyle = 'none';
+                                    topList.style.padding = '0';
+                                    topList.style.margin = '0.5rem 0 1rem 0';
+                                    
+                                    scores.soft_skills.top_matches.forEach(skill => {
+                                        if (skill) {
+                                            const li = document.createElement('li');
+                                            li.style.padding = '0.5rem 0';
+                                            li.style.borderBottom = '1px solid var(--border-color)';
+                                            li.textContent = skill;
+                                            topList.appendChild(li);
+                                        }
+                                    });
+                                    skillsContainer.appendChild(topList);
+                                }
+                                
+                                if (scores.soft_skills.bottom_matches && scores.soft_skills.bottom_matches.length > 0) {
+                                    const bottomTitle = document.createElement('h4');
+                                    bottomTitle.textContent = 'Bottom 3 skills (low similarity):';
+                                    bottomTitle.style.margin = '1rem 0 0.5rem 0';
+                                    skillsContainer.appendChild(bottomTitle);
+                                    
+                                    const bottomList = document.createElement('ul');
+                                    bottomList.style.listStyle = 'none';
+                                    bottomList.style.padding = '0';
+                                    bottomList.style.margin = '0.5rem 0';
+                                    
+                                    scores.soft_skills.bottom_matches.forEach(skill => {
+                                        if (skill) {
+                                            const li = document.createElement('li');
+                                            li.style.padding = '0.5rem 0';
+                                            li.style.borderBottom = '1px solid var(--border-color)';
+                                            li.textContent = skill;
+                                            bottomList.appendChild(li);
+                                        }
+                                    });
+                                    skillsContainer.appendChild(bottomList);
+                                }
+                            } else if (scores.soft_skills.title && scores.soft_skills.skills) {
+                                // Formato con lista ordenada
+                                const title = document.createElement('h4');
+                                title.textContent = scores.soft_skills.title;
+                                title.style.margin = '0.5rem 0';
+                                skillsContainer.appendChild(title);
+                                
+                                const skillsList = document.createElement('ul');
+                                skillsList.style.listStyle = 'none';
+                                skillsList.style.padding = '0';
+                                skillsList.style.margin = '0.5rem 0';
+                                
+                                scores.soft_skills.skills.forEach(skill => {
+                                    if (skill) {
+                                        const li = document.createElement('li');
+                                        li.style.padding = '0.5rem 0';
+                                        li.style.borderBottom = '1px solid var(--border-color)';
+                                        li.textContent = skill;
+                                        skillsList.appendChild(li);
+                                    }
+                                });
+                                skillsContainer.appendChild(skillsList);
+                            }
+                            
+                            details.appendChild(skillsContainer);
+                        }
+                        
+                        // Mostrar detalles de experiencia en el rol
+                        if (category === 'role_experience_score' && scores.role_experience) {
+                            const expDetails = document.createElement('div');
+                            expDetails.style.marginTop = '1rem';
+                            
+                            if (scores.role_experience.explanation) {
+                                const explanation = document.createElement('p');
+                                explanation.textContent = scores.role_experience.explanation;
+                                explanation.style.margin = '0.5rem 0';
+                                expDetails.appendChild(explanation);
+                            }
+                            
+                            details.appendChild(expDetails);
+                        }
+                        
+                        // Mostrar detalles del sector
+                        if (category === 'sector_score' && scores.sector) {
+                            const sectorDetails = document.createElement('div');
+                            sectorDetails.style.marginTop = '1rem';                         
+                            
+                            // Detalles adicionales
+                            if (scores.sector.details) {
+                                const detailList = document.createElement('ul');
+                                detailList.style.listStyle = 'none';
+                                detailList.style.padding = '0';
+                                detailList.style.margin = '0.5rem 0';
+                                
+                                const offerSectorItem = document.createElement('li');
+                                offerSectorItem.style.padding = '0.5rem 0';
+                                offerSectorItem.style.borderBottom = '1px solid var(--border-color)';
+                                offerSectorItem.innerHTML = `<strong>Offer sector:</strong> ${scores.sector.details.offer_sector || 'Not specified'}`;
+                                
+                                const cvSectorItem = document.createElement('li');
+                                cvSectorItem.style.padding = '0.5rem 0';
+                                cvSectorItem.style.borderBottom = '1px solid var(--border-color)';
+                                cvSectorItem.innerHTML = `<strong>CV sector:</strong> ${scores.sector.details.cv_sector || 'Not specified'}`;
+                                
+                                const similarityItem = document.createElement('li');
+                                similarityItem.style.padding = '0.5rem 0';
+                                similarityItem.style.borderBottom = '1px solid var(--border-color)';
+                                similarityItem.innerHTML = `<strong>Similarity:</strong> ${scores.sector.details.similarity || '0'}%`;
+                                
+                                detailList.appendChild(offerSectorItem);
+                                detailList.appendChild(cvSectorItem);
+                                detailList.appendChild(similarityItem);
+                                
+                                sectorDetails.appendChild(detailList);
+                            }
+                            
+                            details.appendChild(sectorDetails);
+                        }
+                        
+                        cardContent.appendChild(details);
+                        
+                        // Construir la estructura
+                        cardHeader.appendChild(title);
+                        cardHeader.appendChild(scoreValue);
+                        cardHeader.appendChild(toggleIcon);
+                        
+                        card.appendChild(cardHeader);
+                        card.appendChild(progressBar);
+                        card.appendChild(cardContent);
+                        
+                        scoresList.appendChild(card);
+                        
+                        // Animar la entrada
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                            
+                            // Animar la barra de progreso
+                            setTimeout(() => {
+                                progressFill.style.width = `${percentage}%`;
+                            }, 50);
+                            
+                            // Toggle para expandir/colapsar
+                            cardHeader.addEventListener('click', () => {
+                                card.classList.toggle('active');
+                            });
+                            
+                        }, 100 * index);
+                    }
+                });
+                
+                // Mostrar resultados con animación
+                resultDiv.style.display = 'block';
+                
+                // Desplazarse suavemente a los resultados
+                setTimeout(() => {
+                    resultDiv.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error showing results:', error);
+                showNotification('Error showing results', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

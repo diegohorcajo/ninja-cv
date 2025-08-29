@@ -1,0 +1,48 @@
+Analiza la siguiente oferta de trabajo.
+
+Oferta:
+{offer_text}
+
+Tareas:
+
+1. Extrae la compañia de la oferta.
+2. Extrae el sector al que se refiere la oferta.
+3. Extrae todas las habilidades técnicas relevantes.
+4. Extrae la experiencia mínima / máxima requerida
+   - si no hay mínima, establecer la mínima como 0
+   - si no hay máxima, establecer la máxima como mínima
+5. Extrae la educación mínima requerida y en caso de que haya varias opciones, coger la mínima siguiendo el orden:
+  
+  1. Educación secundaria/bachillerato
+  2. Bootcamp
+  3. Formación profesional
+  4. Grado universitario
+  5. Máster
+  6. Doctorado
+
+Si en la oferta está escrito "grado x ó grado y", coger el grado mínimo. Si por el contrario está escrito "grado x y grado y", coger el grado máximo.
+
+  En el json mostrar el texto y el numero asociado en otro parámetro "number".
+  Además indica el campo de estudio más relevante requerido asociado al nivel educativo.
+
+6. Extrae las soft skills
+
+Devuelve la respuesta en formato JSON en inglés americano (el contenido del JSON también debe ser en inglés americano) y con esta estructura exacta:
+{
+  "company": "nombre empresa",
+  "sector": "nombre sector",
+  "role": "nombre rol",
+  "technical_abilities": [ ... ],
+  "experience": {
+    "min": X,
+    "max": Y
+  },
+  "education": {
+    "min": X,
+    "number": Y,
+    "field": Z
+  },
+  "soft_skills": [ ... ]
+}
+
+No incluyas explicaciones adicionales fuera del JSON.

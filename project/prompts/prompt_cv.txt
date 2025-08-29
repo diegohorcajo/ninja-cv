@@ -1,0 +1,61 @@
+Analiza el siguiente CV.
+
+CV:
+{cv_text}
+
+Tareas:
+
+1. Extrae todas las habilidades técnicas del candidato.
+2. Extrae todas las soft skills relevantes.
+3. Calcula los años de experiencia del candidato por empresa.
+   - Si aparece directamente la antigüedad en años, usa ese valor.
+   - Si aparecen fechas de inicio y fin, resta ambas (fin - inicio).
+   - Si no aparece fecha fin, usa la fecha actual {actual_date} como fin.
+   - Si dentro de una empresa hay varios roles, suma los años de cada rol.
+  Por favor piensa muy bien y toma el tiempo que necesites en hacer esta operación, ya que es muy importante. Formatea todos las fechas al mismo formato si así es más sencillo hacer la operación
+  Sobre todo si la fecha fin no está escrita en el CV, es importante que hagas la resta de la fecha actual {actual_date} - fecha inicio. Siempre hacer la resta año-mes y devolver en años.
+
+4. Identifica el sector o industria principal de la experiencia del candidato.
+5. Extrae los grados de educación del candidato, siguiendo la siguiente jerarquía:
+
+  1. Educación secundaria/bachillerato
+  2. Bootcamp
+  3. Formación profesional
+  4. Grado universitario
+  5. Máster
+  6. Doctorado
+
+  En el json mostrar el texto (degree, en inglés americano) y el numero asociado en otro parámetro "number".
+  Además indica el campo de estudio más relevante.
+
+Devuelve la respuesta en formato JSON en inglés americano y con esta estructura exacta:
+
+{
+  "technical_abilities": [ ... ],
+  "soft_skills": [ ... ],
+  "experience": [
+    {
+      "company": "nombre empresa",
+      "roles": [
+        {"position": "name", "years": X},
+        {"position": "name", "years": Y},
+      ],
+      "total_years": Z (sería X + Y)
+    }
+  ],
+  "primary_sector": [ *incluir máximo 2 sectores* ],
+  "education": [{
+                "degree": X,
+                "number": Y,
+                "field": Z
+                }, 
+                {
+                "degree": X,
+                "number": Y,
+                "field": Z
+                }, ...]
+}
+
+Por favor no alterar el orden de ningún elemento, devolverlo exactamente en este formato.
+No incluyas explicaciones adicionales fuera del JSON. 
+Eliminar ```json y ``` de los extremos de la respuesta.
