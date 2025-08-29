@@ -1,7 +1,6 @@
 import json
 import traceback
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from gemini_api import GeminiAPI
 import os
@@ -26,6 +25,7 @@ class CVMatcher:
 
 
     def _load_model(self):
+        from sentence_transformers import SentenceTransformer
         # Esta función carga el modelo solo si no ha sido cargado antes
         if self.model is None:
             print("Loading SentenceTransformer model for the first time...")
