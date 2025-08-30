@@ -1,11 +1,15 @@
 ---
-title: Ninja Cv
-emoji: 🏢
+title: Ninja CV Recommender
+emoji: 📄
 colorFrom: blue
-colorTo: pink
+colorTo: green
 sdk: docker
-pinned: false
-license: mit
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+# Ninja CV Recommender
+
+Esta es una aplicación para analizar la compatibilidad entre un CV y una oferta de empleo usando IA.
+
+- **Sube tu CV** en formato PDF.
+- **Pega el texto** de la oferta de empleo.
+- ¡Recibe un análisis detallado!
