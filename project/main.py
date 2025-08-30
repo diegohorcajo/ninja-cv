@@ -53,9 +53,9 @@ STATIC_DIR = BASE_DIR / "static"
 TEMPLATES_DIR = BASE_DIR / "templates"
 
 # Crear directorios si no existen
-#TMP_DIR.mkdir(exist_ok=True)
-#STATIC_DIR.mkdir(exist_ok=True)
-#TEMPLATES_DIR.mkdir(exist_ok=True)
+# TMP_DIR.mkdir(exist_ok=True)
+# STATIC_DIR.mkdir(exist_ok=True)
+# TEMPLATES_DIR.mkdir(exist_ok=True)
 
 # Montar archivos estáticos
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
