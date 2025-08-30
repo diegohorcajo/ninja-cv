@@ -1,27 +1,23 @@
-# 1. Usamos una imagen base de Python.
-#    Esto crea un mini-ordenador virtual con Python ya instalado.
-FROM python:3.11-slim
+# 1. Empezamos con la misma imagen de Python
+FROM python:3.12-slim
 
-# 2. Creamos y nos movemos a una carpeta de trabajo llamada /app dentro del mini-ordenador.
-#    A partir de ahora, todos los comandos se ejecutarán desde aquí.
+# 2. Establecemos nuestro directorio de trabajo en /app
 WORKDIR /app
 
-# 3. Copiamos el fichero de requisitos desde tu ordenador al mini-ordenador.
-#    - './requirements.txt' es la ruta en tu proyecto (la raíz).
-#    - '/app/requirements.txt' es la ruta de destino dentro del contenedor.
-COPY ./requirements.txt /app/requirements.txt
+# --- CAMBIO IMPORTANTE ---
+# 3. Copiamos el fichero requirements.txt DESDE DENTRO de tu carpeta 'project'
+#    El '.' significa "cópialo aquí", en nuestro directorio de trabajo (/app).
+COPY project/requirements.txt .
 
-# 4. Ejecutamos pip para instalar todas las librerías listadas en el fichero que acabamos de copiar.
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+# 4. Instalamos las dependencias. Ahora pip encontrará requirements.txt en /app.
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# 5. Copiamos tu carpeta 'project' entera desde tu ordenador al mini-ordenador.
-#    - './project' es la carpeta en tu proyecto.
-#    - '/app/project' es la carpeta de destino. Ahora tendremos una estructura /app/project/main.py, etc.
-COPY ./project /app/project
+# --- CAMBIO IMPORTANTE ---
+# 5. Copiamos TODO EL CONTENIDO de tu carpeta 'project' al directorio de trabajo /app.
+#    Esto significa que main.py, static/, prompts/, etc., estarán directamente dentro de /app.
+COPY project/ .
 
-# 6. Este es el comando final que se ejecutará para arrancar tu web.
-#    - "uvicorn": Llama al servidor.
-#    - "project.main:app": Le dice a uvicorn "busca una carpeta llamada 'project', dentro hay un fichero 'main.py', y dentro de ese fichero, usa la variable 'app'". Esto coincide perfectamente con tu estructura.
-#    - "--host 0.0.0.0": Permite que la app sea visible desde fuera.
-#    - "--port 7860": El puerto obligatorio que pide Hugging Face.
-CMD ["uvicorn", "project.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# --- CAMBIO IMPORTANTE ---
+# 6. Como ahora main.py está en la raíz de /app, el comando para iniciar es más simple.
+#    Ya no necesitamos "project.main:app", sino simplemente "main:app".
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
