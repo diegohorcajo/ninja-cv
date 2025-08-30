@@ -112,24 +112,32 @@ async def match_cv(offer_text: str = Form(...),
     file_content = content
     await cv_file.seek(0)
     
-    # Guardar CV temporalmente cambiando el nombre a cv.pdf
-    cv_file.filename = "cv.pdf"
-    cv_path = os.path.join(TMP_DIR, cv_file.filename)
-    with open(cv_path, "wb") as f:
-        f.write(content)
-
-    # Guardar oferta como txt temporal
-    offer_path = os.path.join(TMP_DIR, "offer.txt")
-    with open(offer_path, "w", encoding="utf-8") as f:
-        f.write(offer_text)
-
-    # Calcular similitud usando tu matcher
     try:
-        scores = matcher.final_score(offer_path, cv_path)
-    except Exception as e:
-        return {"error": str(e)}
+        # Guardar CV temporalmente cambiando el nombre a cv.pdf
+        cv_file.filename = "cv.pdf"
+        cv_path = os.path.join(TMP_DIR, cv_file.filename)
+        with open(cv_path, "wb") as f:
+            f.write(content)
 
-    return scores
+        # Guardar oferta como txt temporal
+        offer_path = os.path.join(TMP_DIR, "offer.txt")
+        with open(offer_path, "w", encoding="utf-8") as f:
+            f.write(offer_text)
+
+        # Calcular similitud usando tu matcher
+        try:
+            scores = matcher.final_score(offer_path, cv_path)
+        except Exception as e:
+            return {"error": str(e)}
+
+        return scores
+    
+    finally:
+        # Limpiar archivos temporales
+        if os.path.exists(cv_path):
+            os.remove(cv_path)
+        if os.path.exists(offer_path):
+            os.remove(offer_path)
 
 
 if __name__ == "__main__":
