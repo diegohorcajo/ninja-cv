@@ -80,7 +80,7 @@ class CVMatcher:
 
     # ----------- 2. Educación -----------
     def preprocess_field(self, field):
-            # Forzamos la conversión a string ANTES de hacer cualquier otra cosa
+            #Forzamos la conversión a string ANTES de hacer cualquier otra cosa
             return f"field of study: {str(field).lower().strip().replace(',', ' and')}"
 
 
