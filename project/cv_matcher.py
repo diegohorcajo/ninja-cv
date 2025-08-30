@@ -38,13 +38,15 @@ class CVMatcher:
 
     # ----------- 1. Sector -----------
     def preprocess_sector(self, sector):
-        self._load_model()
-        if isinstance(sector, str):
-            output = sector.lower().strip().replace(",", " and")
-        elif isinstance(sector, list):
-            output = " and ".join([s.lower().strip() for s in sector])
+        # Primero, manejamos el caso de que sea una lista
+        if isinstance(sector, list):
+            # Nos aseguramos de que cada elemento de la lista sea un string antes de unir
+            processed_list = [str(s).lower().strip() for s in sector]
+            output = " and ".join(processed_list)
         else:
-            output = ""
+            # Para todo lo demás (str, int, float, None), lo convertimos a string PRIMERO
+            output = str(sector).lower().strip().replace(",", " and")
+        
         return f"principal job sector: {output}"
 
     def sector_similarity(self, offer_dict, cv_dict):
@@ -78,8 +80,8 @@ class CVMatcher:
 
     # ----------- 2. Educación -----------
     def preprocess_field(self, field):
-        self._load_model()
-        return f"field of study: {field.lower().strip().replace(',', ' and')}"
+            # Forzamos la conversión a string ANTES de hacer cualquier otra cosa
+            return f"field of study: {str(field).lower().strip().replace(',', ' and')}"
 
 
     def education_similarity(self, offer_dict, cv_education):
