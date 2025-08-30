@@ -1,0 +1,27 @@
+# 1. Usamos una imagen base de Python.
+#    Esto crea un mini-ordenador virtual con Python ya instalado.
+FROM python:3.11-slim
+
+# 2. Creamos y nos movemos a una carpeta de trabajo llamada /app dentro del mini-ordenador.
+#    A partir de ahora, todos los comandos se ejecutarán desde aquí.
+WORKDIR /app
+
+# 3. Copiamos el fichero de requisitos desde tu ordenador al mini-ordenador.
+#    - './requirements.txt' es la ruta en tu proyecto (la raíz).
+#    - '/app/requirements.txt' es la ruta de destino dentro del contenedor.
+COPY ./requirements.txt /app/requirements.txt
+
+# 4. Ejecutamos pip para instalar todas las librerías listadas en el fichero que acabamos de copiar.
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+# 5. Copiamos tu carpeta 'project' entera desde tu ordenador al mini-ordenador.
+#    - './project' es la carpeta en tu proyecto.
+#    - '/app/project' es la carpeta de destino. Ahora tendremos una estructura /app/project/main.py, etc.
+COPY ./project /app/project
+
+# 6. Este es el comando final que se ejecutará para arrancar tu web.
+#    - "uvicorn": Llama al servidor.
+#    - "project.main:app": Le dice a uvicorn "busca una carpeta llamada 'project', dentro hay un fichero 'main.py', y dentro de ese fichero, usa la variable 'app'". Esto coincide perfectamente con tu estructura.
+#    - "--host 0.0.0.0": Permite que la app sea visible desde fuera.
+#    - "--port 7860": El puerto obligatorio que pide Hugging Face.
+CMD ["uvicorn", "project.main:app", "--host", "0.0.0.0", "--port", "7860"]
