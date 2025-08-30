@@ -5,4 +5,3 @@ project/__pycache__
 .env
 project/ninja_cv.ipynb
 project/tmp
-templates
