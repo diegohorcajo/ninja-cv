@@ -21,7 +21,7 @@ class CVMatcher:
     # all-MiniLM-L6-v2
     # paraphrase-MiniLM-L3-v2
     # TaylorAI/bge-micro-v2
-    def __init__(self, model_name="TaylorAI/bge-micro-v2"):
+    def __init__(self, model_name="all-MiniLM-L6-v2"):
         self.model   = None
         self.model_name = model_name
         self.cv_data = None
