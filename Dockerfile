@@ -17,7 +17,11 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 #    Esto significa que main.py, static/, prompts/, etc., estarán directamente dentro de /app.
 COPY project/ .
 
+# --- AÑADE ESTA LÍNEA AQUÍ ---
+# 6. Copiamos también la carpeta 'templates'
+COPY templates/ ./templates/
+
 # --- CAMBIO IMPORTANTE ---
-# 6. Como ahora main.py está en la raíz de /app, el comando para iniciar es más simple.
+# 7. Como ahora main.py está en la raíz de /app, el comando para iniciar es más simple.
 #    Ya no necesitamos "project.main:app", sino simplemente "main:app".
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
