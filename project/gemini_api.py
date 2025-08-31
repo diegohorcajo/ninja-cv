@@ -63,10 +63,12 @@ def read_cv(file_path: str) -> str:
         blocks_sorted = sorted(text, key=lambda b: (b[1], b[0]))
         for b in blocks_sorted:
             cv += b[4]
-        if len(cv) > 10000:
-            return -1
-        elif len(cv) < 10:
-            return -2
+
+        # if len(cv) > 10000:
+        #     return -1
+        # elif len(cv) < 10:
+        #     return -2
+
     return cv
 
 
@@ -217,6 +219,19 @@ class GeminiAPI:
     def parse_cv(self, cv_path: str) -> dict:
         """Devuelve CV como diccionario limpio"""
         cv_text = read_cv(cv_path)
+
+        # --- AÑADIR ESTA COMPROBACIÓN AQUÍ ---
+        if isinstance(cv_text, int):
+            if cv_text == -1:
+                # Este diccionario de error será devuelto y mostrado al usuario
+                return {"error": "The CV text is too long (more than 10,000 characters)."}
+            elif cv_text == -2:
+                # Este también
+                return {"error": "The CV text is too short or could not be read properly from the PDF."}
+            else:
+                return {"error": "An unknown error occurred while reading the CV file."}
+        
+        # Si el código llega aquí, significa que cv_text es texto y podemos continuar
         prompt = self.load_prompt("./prompts/prompt_cv.txt")
         now = datetime.now()
         actual_date = now.strftime("%B, %Y")
