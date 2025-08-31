@@ -218,8 +218,8 @@ class CVMatcher:
             weighted_experience += similarity * exp['years']
             
         # Get min and max experience from offer
-        min_exp = float(offer_dict.get('experience', {}).get('min', 0))
-        max_exp = float(offer_dict.get('experience', {}).get('max', min_exp + 5))  # Default range if max not specified
+        min_exp = float(offer_dict.get('experience', {}).get('min', 0.0))
+        max_exp = float(offer_dict.get('experience', {}).get('max',  9999.0))  # Default range if max not specified
         
         # Calculate experience percentage (capped at 1.0)
         if min_exp > 0:
@@ -293,6 +293,27 @@ class CVMatcher:
         # Get role experience details
         min_exp, max_exp, total_exp, exp_score = self.role_experience_similarity(offer_dict, cv_dict)
         role = offer_dict.get("role", "")
+
+        # --- NUEVA LÓGICA CLARA Y ROBUSTA PARA EL TEXTO DE EXPERIENCIA ---
+        min_exp_raw = offer_dict.get('experience', {}).get('min', 0)
+        max_exp_raw = offer_dict.get('experience', {}).get('max', 9999.0)
+        
+        # Convert to float for consistent comparison
+        min_exp = float(min_exp_raw) if min_exp_raw is not None else 0
+        max_exp = float(max_exp_raw) if max_exp_raw is not None else 9999.0
+        
+        experience_requirement_text = ""
+        # Caso 1: No se especifica experiencia mínima o es 0.
+        if min_exp == 0:
+            experience_requirement_text = "There's not any experience required for this role."
+        # Caso 2: Se especifica un mínimo pero no un máximo (o máximo muy alto).
+        elif max_exp >= 9999.0:
+            experience_requirement_text = f"The offer is looking for someone with more than {int(min_exp)} years of experience."
+        # Caso 3: Se especifican ambos, mínimo y máximo.
+        else:
+            experience_requirement_text = f"The offer is looking for between {int(min_exp)} and {int(max_exp)} years of experience."
+
+        full_explanation = f"You have approximately {round(total_exp, 1)} years of experience in roles similar to '{role}'. {experience_requirement_text}"
         
         # Get sector information
         sector_similarity = self.sector_similarity(offer_dict, cv_dict)
@@ -301,88 +322,84 @@ class CVMatcher:
         
         # Get education information
         education_score = self.education_final_score(offer_dict, cv_dict)
-        min_education       = float(offer_dict.get("education", {}).get("number", 0))
+        min_education = float(offer_dict.get("education", {}).get("number", 0))
         min_education_level = offer_dict.get("education", {}).get("min", "No especificado")
         min_education_field = offer_dict.get("education", {}).get("field", "No especificado")
         
-        # Find same level education and higher education
-        same_level_education = []
-        higher_education     = []
-        
-        for edu in cv_dict.get("education", []):
-            try:
-                edu_level = float(edu.get("number", 0))
-                if edu_level == min_education:
-                    same_level_education.append(edu)
-                elif edu_level > min_education:
-                    higher_education.append(edu)
-            except (ValueError, TypeError):
-                continue
-        
-        # Prepare education explanation
-        same_level_text = ""
-        if same_level_education:
-            same_level_text = f"The candidate has the same required education level: {same_level_education[0].get('degree', 'Similar level')}"
+        # Get candidate's education and find the highest degree
+        cv_education_list = cv_dict.get("education", [])
+        highest_cv_degree = None
+        if cv_education_list:
+            sorted_cv_education = sorted(cv_education_list, key=lambda x: float(x.get('number', 0)), reverse=True)
+            highest_cv_degree = sorted_cv_education[0]
+
+        education_details = {}
+        education_explanation = ""
+
+        # SCENARIO 1: The offer does NOT specify a minimum education level
+        if min_education == 0:
+            education_explanation = "The offer does not specify a minimum education level. The candidate's highest degree is shown for reference."
+            education_details = {
+                "minimum_required_level": "Not specified",
+                "minimum_required_field": min_education_field if min_education_field != "No especificado" else "Not specified",
+                # USAMOS LAS CLAVES ORIGINALES para no romper el HTML
+                "equivalent_level_cv": highest_cv_degree.get('degree', 'Not available') if highest_cv_degree else 'Not available',
+                "equivalent_field_cv": highest_cv_degree.get('field', 'Not available') if highest_cv_degree else 'Not available',
+                # Devolvemos una lista vacía, el JS lo mostrará como 'None'
+                "higher_education_degrees": [],
+                "meets_requirement": True 
+            }
+        # SCENARIO 2: The offer DOES specify a minimum education level
         else:
-            same_level_text = "The candidate does not have the same required education level"
+            same_level_education = [edu for edu in cv_education_list if float(edu.get('number', 0)) == min_education]
+            higher_education = [edu for edu in cv_education_list if float(edu.get('number', 0)) > min_education]
+
+            match_text = "The candidate meets the minimum requirement." if same_level_education or higher_education else "The candidate does not meet the minimum requirement."
+            education_explanation = f"The offer requires at least {min_education_level}. {match_text}"
             
-        higher_education_text = ""
-        if higher_education:
-            higher_education_text = ", ".join([edu.get('degree', '') for edu in higher_education])
-        else:
-            higher_education_text = "No higher education"
-        
-        # Format the return dictionary with all the processed information
+            # Find the most relevant degree to show as "equivalent"
+            equivalent_education = same_level_education[0] if same_level_education else (highest_cv_degree if higher_education else {})
+            
+            education_details = {
+                "minimum_required_level": min_education_level,
+                "minimum_required_field": min_education_field,
+                "equivalent_level_cv": equivalent_education.get('degree', 'Not available'),
+                "equivalent_field_cv": equivalent_education.get('field', 'Not available'),
+                "higher_education_degrees": [edu.get('degree', '') for edu in higher_education],
+                "meets_requirement": education_score >= 0.5
+            }
+
+        # Format the final return dictionary with all the processed information
         result = {
-            # Scores
             "technical_skills_score": int(np.round(100 * tech_score, 2)),
             "soft_skills_score": int(np.round(100 * soft_score, 2)),
             "role_experience_score": int(np.round(100 * exp_score, 2)),
             "education_score": int(np.round(100 * education_score, 2)),
             "sector_score": int(np.round(100 * sector_similarity, 2)),
             
-            # Detailed information
             "technical_skills": tech_skills,
             "soft_skills": soft_skills,
             
-            # Role experience details
             "role_experience": {
-                "explanation": f"You have approximately {round(total_exp, 1)} years of experience in roles similar to '{role}'. "
-                              f"The offer is looking for between {min_exp} and {max_exp} years of experience.",
+                "explanation": full_explanation,  # Usamos la variable que acabamos de crear
                 "details": {
-                    "role": role,
-                    "min_years": min_exp,
-                    "max_years": max_exp,
-                    "total_experience": round(total_exp, 1)
+                    "role": role, "min_years": min_exp, "max_years": max_exp, "total_experience": round(total_exp, 1)
                 }
             },
             
-            # Education details
             "education": {
-                "explanation": f"The offer requires at least {min_education_level}. {same_level_text}.",
-                "details": {
-                    "minimum_required_level": min_education_level,
-                    "minimum_required_field": min_education_field,
-                    "equivalent_level_cv": same_level_education[0].get('degree', 'Not available') if same_level_education else 'Not available',
-                    "equivalent_field_cv": same_level_education[0].get('field', 'Not available') if same_level_education else 'Not available',
-                    "higher_education_degrees": [edu.get('degree', '') for edu in higher_education],
-                    "higher_education_fields": [edu.get('field', '') for edu in higher_education],
-                    "meets_requirement": education_score >= 0.5
-                }
+                "explanation": education_explanation,
+                "details": education_details
             },
             
-            # Sector information
             "sector": {
-                "explanation": f"The offer's sector is '{offer_sector}' and your main sector is '{cv_sector}'. "
+                "explanation": f"The offer's sector is '{offer_sector}' and your main sector is '{' and '.join(cv_sector) if isinstance(cv_sector, list) else cv_sector}'. "
                               f"The similarity between both sectors is {round(sector_similarity * 100, 1)}%.",
                 "details": {
-                    "offer_sector": offer_sector,
-                    "cv_sector": cv_sector,
-                    "similarity": round(sector_similarity * 100, 1)
+                    "offer_sector": offer_sector, "cv_sector": ' and '.join(cv_sector) if isinstance(cv_sector, list) else cv_sector, "similarity": round(sector_similarity * 100, 1)
                 }
             }
         }
-
         
         return result
 

@@ -10,7 +10,7 @@ Tareas:
 3. Extrae todas las habilidades técnicas relevantes.
 4. Extrae la experiencia mínima / máxima requerida
    - si no hay mínima, establecer la mínima como 0
-   - si no hay máxima, establecer la máxima como mínima
+   - si no hay máxima, establecer la máxima 9999
 5. Extrae la educación mínima requerida y en caso de que haya varias opciones, coger la mínima siguiendo el orden:
   
   1. Educación secundaria/bachillerato

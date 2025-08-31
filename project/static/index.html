@@ -1303,12 +1303,21 @@
                 
                 const data = await response.json();
                 console.log('Received data:', data);
-                
+
+                // Esta parte ya maneja los errores que envía explícitamente el backend
                 if (data.error) {
                     throw new Error(data.error);
                 }
+
+                // --- AÑADE ESTA NUEVA COMPROBACIÓN AQUÍ ---
+                // Si el objeto de respuesta no contiene las puntuaciones clave,
+                // asumimos que el PDF no se pudo procesar correctamente.
+                if (data.technical_skills_score === undefined || data.technical_skills_score === null) {
+                    throw new Error("The PDF could not be read correctly or is empty. Please check the file.");
+                }
+                // --- FIN DE LA NUEVA COMPROBACIÓN ---
                 
-                // Mostrar resultados con animación
+                // Si todo está bien, mostramos los resultados
                 setTimeout(() => {
                     displayResults(data);
                     showNotification('Analysis completed successfully!', 'success');

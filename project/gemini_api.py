@@ -64,10 +64,10 @@ def read_cv(file_path: str) -> str:
         for b in blocks_sorted:
             cv += b[4]
 
-        # if len(cv) > 10000:
-        #     return -1
-        # elif len(cv) < 10:
-        #     return -2
+        if len(cv) > 10000:
+             return -1
+        elif len(cv) < 10:
+             return -2
 
     return cv
 
